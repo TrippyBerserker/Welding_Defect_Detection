@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welding Defect Detection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        h1 {
+            font-size: 20px;
+            color: #333;
+        }
+        input[type="file"] {
+            margin: 15px 0;
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 15px;
+            font-size: 16px;
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welding Defect Detection</h1>
+        <form id="uploadForm">
+            <input type="file" id="imageInput" accept="image/*" required />
+            <br>
+            <button type="submit">Upload and Predict</button>
+        </form>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        const uploadForm = document.getElementById('uploadForm');
+        const resultDiv = document.getElementById('result');
+
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const imageInput = document.getElementById('imageInput');
+
+            if (imageInput.files.length === 0) {
+                resultDiv.textContent = 'Please select an image first.';
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('image', imageInput.files[0]);
+
+            try {
+                resultDiv.textContent = 'Processing...';
+
+                const response = await fetch('http://localhost:5000/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Prediction failed.');
+                }
+
+                const data = await response.json();
+                resultDiv.textContent = `Prediction: ${data.prediction}`;
+            } catch (error) {
+                resultDiv.textContent = `Error: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
